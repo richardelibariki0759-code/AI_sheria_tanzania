@@ -8,8 +8,6 @@ interface ChatMessage {
   text: string;
 }
 
-// This is where your Flask kitchen lives. Change it when you deploy
-// (e.g. to your Cloud Run URL) — everything else stays the same.
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
 @Component({
@@ -24,8 +22,8 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
   isOpen = true;
   isExpanded = true;
   draftMessage = '';
+  isTyping = false;
 
-  // Starts empty — filled in by GET /api/topics once the component loads.
   topics: string[] = [];
 
   messages: ChatMessage[] = [
@@ -37,21 +35,14 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
 
   constructor(private http: HttpClient) {}
 
-  // Bound reference so we can remove this exact listener later.
   private readonly handleViewportResize = (): void => this.updateKeyboardOffset();
 
   ngOnInit(): void {
-    // The "order slip" here is a GET request — we're just asking for
-    // information, not sending anything.
     this.http.get<{ topics: string[] }>(`${API_BASE_URL}/api/topics`).subscribe({
       next: (res) => (this.topics = res.topics),
-      error: (err) => console.error('Could not load topics from Flask:', err)
+      error: (err) => console.error('Failed to load topics from backend:', err)
     });
 
-    // window.visualViewport reports the *actually visible* area of the
-    // page — when a phone's on-screen keyboard opens, this shrinks even
-    // though window.innerHeight (the full layout) doesn't. Comparing the
-    // two tells us exactly how much space the keyboard is taking up.
     if (typeof window !== 'undefined' && window.visualViewport) {
       window.visualViewport.addEventListener('resize', this.handleViewportResize);
       window.visualViewport.addEventListener('scroll', this.handleViewportResize);
@@ -70,10 +61,7 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
     if (!viewport) {
       return;
     }
-    // How much of the window the keyboard is currently covering.
     const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-    // Write it onto the page as a CSS variable — sheria-chat-widget.scss
-    // reads --keyboard-offset to push the card up above the keyboard.
     document.documentElement.style.setProperty('--keyboard-offset', `${keyboardHeight}px`);
   }
 
@@ -105,21 +93,32 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
     this.draftMessage = '';
   }
 
-  private sendToBackend(text: string): void {
-    // Show the user's own message immediately — don't wait on the network.
-    this.messages.push({ from: 'user', text });
+  onEnterKey(event: Event): void {
+    const keyboardEvent = event as KeyboardEvent;
+    if (!keyboardEvent.shiftKey) {
+      keyboardEvent.preventDefault();
+      this.sendMessage();
+    }
+  }
 
-    // This is a POST request — we're sending data ({ message: text }) and
-    // expecting Flask to send something back in return.
+  private sendToBackend(text: string): void {
+    this.messages.push({ from: 'user', text });
+    this.isTyping = true;
+
     this.http
       .post<{ reply: string }>(`${API_BASE_URL}/api/chat`, { message: text })
       .subscribe({
-        next: (res) => this.messages.push({ from: 'bot', text: res.reply }),
-        error: () =>
+        next: (res) => {
+          this.isTyping = false;
+          this.messages.push({ from: 'bot', text: res.reply });
+        },
+        error: () => {
+          this.isTyping = false;
           this.messages.push({
             from: 'bot',
             text: "Sorry, I couldn't reach the server. Is the Flask app running?"
-          })
+          });
+        }
       });
   }
 
@@ -130,7 +129,6 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
         el.scrollTop = el.scrollHeight;
       }
     } catch {
-      // element not rendered yet — nothing to do
     }
   }
 }
