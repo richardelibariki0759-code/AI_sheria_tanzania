@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -18,7 +18,7 @@ const API_BASE_URL = 'http://127.0.0.1:5000';
   templateUrl: './sheria-chat-widget.html',
   styleUrl: './sheria-chat-widget.scss'
 })
-export class SheriaChatWidget implements OnInit, AfterViewChecked {
+export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
   @ViewChild('scrollArea') private scrollArea!: ElementRef<HTMLDivElement>;
 
   isOpen = true;
@@ -37,6 +37,9 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
 
   constructor(private http: HttpClient) {}
 
+  // Bound reference so we can remove this exact listener later.
+  private readonly handleViewportResize = (): void => this.updateKeyboardOffset();
+
   ngOnInit(): void {
     // The "order slip" here is a GET request — we're just asking for
     // information, not sending anything.
@@ -44,6 +47,34 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
       next: (res) => (this.topics = res.topics),
       error: (err) => console.error('Could not load topics from Flask:', err)
     });
+
+    // window.visualViewport reports the *actually visible* area of the
+    // page — when a phone's on-screen keyboard opens, this shrinks even
+    // though window.innerHeight (the full layout) doesn't. Comparing the
+    // two tells us exactly how much space the keyboard is taking up.
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      window.visualViewport.addEventListener('resize', this.handleViewportResize);
+      window.visualViewport.addEventListener('scroll', this.handleViewportResize);
+    }
+  }
+
+  ngOnDestroy(): void {
+    if (typeof window !== 'undefined' && window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', this.handleViewportResize);
+      window.visualViewport.removeEventListener('scroll', this.handleViewportResize);
+    }
+  }
+
+  private updateKeyboardOffset(): void {
+    const viewport = window.visualViewport;
+    if (!viewport) {
+      return;
+    }
+    // How much of the window the keyboard is currently covering.
+    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
+    // Write it onto the page as a CSS variable — sheria-chat-widget.scss
+    // reads --keyboard-offset to push the card up above the keyboard.
+    document.documentElement.style.setProperty('--keyboard-offset', `${keyboardHeight}px`);
   }
 
   ngAfterViewChecked(): void {

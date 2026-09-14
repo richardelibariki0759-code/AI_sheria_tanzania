@@ -11,15 +11,19 @@
 .widget-shell {
   position: fixed;
   right: 24px;
-  bottom: 100px;
+  /* --keyboard-offset is 0 normally; the component's JS raises it to
+     the on-screen keyboard's height while it's open, so this card
+     (and the input inside it) never end up hidden underneath it. */
+  bottom: calc(100px + var(--keyboard-offset, 0px));
   width: 380px;
   max-width: calc(100vw - 32px);
   /* Reserve 100px below (for the fab + margin) and 24px above, so the
      card always has breathing room on both ends, on any screen height.
      dvh accounts for mobile browser toolbars; vh is the fallback. */
-  max-height: min(640px, calc(100vh - 124px));
-  max-height: min(640px, calc(100dvh - 124px));
+  max-height: min(640px, calc(100vh - 124px - var(--keyboard-offset, 0px)));
+  max-height: min(640px, calc(100dvh - 124px - var(--keyboard-offset, 0px)));
   z-index: 1000;
+  transition: bottom 0.15s ease;
 }
 
 .widget-card {
