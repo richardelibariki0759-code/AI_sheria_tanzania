@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked, OnInit, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewChecked, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
@@ -8,6 +8,8 @@ interface ChatMessage {
   text: string;
 }
 
+// This is where your Flask kitchen lives. Change it when you deploy
+// (e.g. to your Cloud Run URL) — everything else stays the same.
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
 @Component({
@@ -16,14 +18,14 @@ const API_BASE_URL = 'http://127.0.0.1:5000';
   templateUrl: './sheria-chat-widget.html',
   styleUrl: './sheria-chat-widget.scss'
 })
-export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
+export class SheriaChatWidget implements OnInit, AfterViewChecked {
   @ViewChild('scrollArea') private scrollArea!: ElementRef<HTMLDivElement>;
 
   isOpen = true;
   isExpanded = true;
   draftMessage = '';
-  isTyping = false;
 
+  // Starts empty — filled in by GET /api/topics once the component loads.
   topics: string[] = [];
 
   messages: ChatMessage[] = [
@@ -35,34 +37,13 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
 
   constructor(private http: HttpClient) {}
 
-  private readonly handleViewportResize = (): void => this.updateKeyboardOffset();
-
   ngOnInit(): void {
+    // The "order slip" here is a GET request — we're just asking for
+    // information, not sending anything.
     this.http.get<{ topics: string[] }>(`${API_BASE_URL}/api/topics`).subscribe({
       next: (res) => (this.topics = res.topics),
-      error: (err) => console.error('Failed to load topics from backend:', err)
+      error: (err) => console.error('Could not load topics from Flask:', err)
     });
-
-    if (typeof window !== 'undefined' && window.visualViewport) {
-      window.visualViewport.addEventListener('resize', this.handleViewportResize);
-      window.visualViewport.addEventListener('scroll', this.handleViewportResize);
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (typeof window !== 'undefined' && window.visualViewport) {
-      window.visualViewport.removeEventListener('resize', this.handleViewportResize);
-      window.visualViewport.removeEventListener('scroll', this.handleViewportResize);
-    }
-  }
-
-  private updateKeyboardOffset(): void {
-    const viewport = window.visualViewport;
-    if (!viewport) {
-      return;
-    }
-    const keyboardHeight = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop);
-    document.documentElement.style.setProperty('--keyboard-offset', `${keyboardHeight}px`);
   }
 
   ngAfterViewChecked(): void {
@@ -93,32 +74,21 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
     this.draftMessage = '';
   }
 
-  onEnterKey(event: Event): void {
-    const keyboardEvent = event as KeyboardEvent;
-    if (!keyboardEvent.shiftKey) {
-      keyboardEvent.preventDefault();
-      this.sendMessage();
-    }
-  }
-
   private sendToBackend(text: string): void {
+    // Show the user's own message immediately — don't wait on the network.
     this.messages.push({ from: 'user', text });
-    this.isTyping = true;
 
+    // This is a POST request — we're sending data ({ message: text }) and
+    // expecting Flask to send something back in return.
     this.http
       .post<{ reply: string }>(`${API_BASE_URL}/api/chat`, { message: text })
       .subscribe({
-        next: (res) => {
-          this.isTyping = false;
-          this.messages.push({ from: 'bot', text: res.reply });
-        },
-        error: () => {
-          this.isTyping = false;
+        next: (res) => this.messages.push({ from: 'bot', text: res.reply }),
+        error: () =>
           this.messages.push({
             from: 'bot',
             text: "Sorry, I couldn't reach the server. Is the Flask app running?"
-          });
-        }
+          })
       });
   }
 
@@ -129,6 +99,7 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked, OnDestroy {
         el.scrollTop = el.scrollHeight;
       }
     } catch {
+      // element not rendered yet — nothing to do
     }
   }
 }
