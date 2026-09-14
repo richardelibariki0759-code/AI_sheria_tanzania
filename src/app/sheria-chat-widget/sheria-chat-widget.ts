@@ -8,8 +8,6 @@ interface ChatMessage {
   text: string;
 }
 
-// This is where your Flask kitchen lives. Change it when you deploy
-// (e.g. to your Cloud Run URL) — everything else stays the same.
 const API_BASE_URL = 'http://127.0.0.1:5000';
 
 @Component({
@@ -25,11 +23,8 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   isExpanded = true;
   draftMessage = '';
 
-  // Once true, the topic chips are hidden — they're only for the
-  // empty/welcome state before the user has actually said anything.
   chatStarted = false;
 
-  // Starts empty — filled in by GET /api/topics once the component loads.
   topics: string[] = [];
 
   messages: ChatMessage[] = [
@@ -42,8 +37,6 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    // The "order slip" here is a GET request — we're just asking for
-    // information, not sending anything.
     this.http.get<{ topics: string[] }>(`${API_BASE_URL}/api/topics`).subscribe({
       next: (res) => (this.topics = res.topics),
       error: (err) => console.error('Could not load topics from Flask:', err)
@@ -81,11 +74,8 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   private sendToBackend(text: string): void {
     this.chatStarted = true;
 
-    // Show the user's own message immediately — don't wait on the network.
     this.messages.push({ from: 'user', text });
 
-    // This is a POST request — we're sending data ({ message: text }) and
-    // expecting Flask to send something back in return.
     this.http
       .post<{ reply: string }>(`${API_BASE_URL}/api/chat`, { message: text })
       .subscribe({
@@ -105,7 +95,6 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
         el.scrollTop = el.scrollHeight;
       }
     } catch {
-      // element not rendered yet — nothing to do
     }
   }
 }
