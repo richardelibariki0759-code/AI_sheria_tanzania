@@ -14,11 +14,11 @@
   bottom: 100px;
   width: 380px;
   max-width: calc(100vw - 32px);
-  /* Never let the card be taller than the space actually available
-     between it and the top/bottom of the screen. dvh accounts for
-     mobile browser toolbars; vh is the fallback for older browsers. */
-  max-height: min(640px, calc(100vh - 130px));
-  max-height: min(640px, calc(100dvh - 130px));
+  /* Reserve 100px below (for the fab + margin) and 24px above, so the
+     card always has breathing room on both ends, on any screen height.
+     dvh accounts for mobile browser toolbars; vh is the fallback. */
+  max-height: min(640px, calc(100vh - 124px));
+  max-height: min(640px, calc(100dvh - 124px));
   z-index: 1000;
 }
 
@@ -63,6 +63,8 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  font-size: 20px;
+  line-height: 1;
 }
 
 .header-title {
