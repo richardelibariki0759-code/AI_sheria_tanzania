@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { SheriaChatWidget } from './sheria-chat-widget/sheria-chat-widget';
+import { Component } from '@angular/core';
+import { SheriaLanding } from './sheria-landing/sheria-landing';
 
 @Component({
   selector: 'app-root',
-  imports: [SheriaChatWidget],
+  standalone: true,
+  imports: [SheriaLanding],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
-export class App {
-  protected readonly title = signal('sheria-ai-frontend');
-}
+export class App {}

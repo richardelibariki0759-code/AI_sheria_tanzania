@@ -1,0 +1,203 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&display=swap');
+
+:host {
+  display: block;
+
+  --sheria-orange: #f4821f;
+  --sheria-orange-dark: #e0740f;
+  --sheria-ink: #2d2a26;
+
+  --paper: #faf6f0;
+  --band: #f3e9da;
+  --espresso: #201b16;
+  --espresso-soft: #ada297;
+  --cream: #f3e9da;
+  --ink-soft: #4a4038;
+  --rule: #e7dfd2;
+  --rule-dark: rgba(243, 233, 218, 0.18);
+
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background: var(--paper);
+  color: var(--sheria-ink);
+}
+
+.serif {
+  font-family: 'Fraunces', Georgia, serif;
+}
+
+/* ================= Hero ================= */
+.hero {
+  background: var(--espresso);
+  color: var(--cream);
+  padding: 88px 32px 96px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 560px) 1fr;
+  gap: 40px;
+  align-items: center;
+}
+.hero-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: var(--espresso-soft);
+  margin-bottom: 28px;
+}
+.hero-mark svg { flex-shrink: 0; }
+.hero h1 {
+  margin: 0 0 20px;
+  font-size: clamp(34px, 4.4vw, 52px);
+  line-height: 1.08;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  animation: heroIn 560ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.hero p.lede {
+  margin: 0 0 30px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: var(--espresso-soft);
+  max-width: 46ch;
+  animation: heroIn 560ms cubic-bezier(0.16, 1, 0.3, 1) 80ms both;
+}
+@keyframes heroIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-hint {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: var(--cream);
+  animation: heroIn 560ms cubic-bezier(0.16, 1, 0.3, 1) 160ms both;
+}
+.hero-hint .dot-btn {
+  width: 30px; height: 30px; border-radius: 50%;
+  background: var(--sheria-orange);
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.hero-visual {
+  display: flex;
+  justify-content: center;
+  color: var(--espresso-soft);
+}
+.hero-visual svg { width: 100%; max-width: 260px; height: auto; }
+
+/* ================= Areas ================= */
+.areas {
+  padding: 76px 32px;
+}
+.section-inner { max-width: 1080px; margin: 0 auto; }
+.areas h2 {
+  margin: 0 0 8px;
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 500;
+}
+.areas p.section-lede {
+  margin: 0 0 40px;
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 52ch;
+}
+.area-list { border-top: 1px solid var(--rule); }
+.area-row {
+  display: grid;
+  grid-template-columns: minmax(0, 220px) 1fr;
+  gap: 24px;
+  padding: 22px 0;
+  border-bottom: 1px solid var(--rule);
+}
+.area-row h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+.area-row p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+  max-width: 60ch;
+}
+
+/* ================= How it works ================= */
+.how {
+  background: var(--band);
+  padding: 72px 32px;
+}
+.how h2 {
+  margin: 0 0 40px;
+  font-size: clamp(26px, 3vw, 32px);
+  font-weight: 500;
+}
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 36px;
+}
+.how-step {
+  border-left: 2px solid var(--sheria-orange-dark);
+  padding-left: 18px;
+}
+.how-step .step-no {
+  font-size: 13px;
+  color: var(--sheria-orange-dark);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.how-step h3 {
+  margin: 0 0 6px;
+  font-size: 16.5px;
+  font-weight: 600;
+}
+.how-step p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--ink-soft);
+}
+
+/* ================= Footer ================= */
+.site-footer {
+  background: var(--espresso);
+  color: var(--espresso-soft);
+  padding: 40px 32px 90px;
+}
+.site-footer .section-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--rule-dark);
+  padding-top: 24px;
+}
+.site-footer p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 56ch;
+}
+.site-footer .footer-brand {
+  color: var(--cream);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .hero-inner { grid-template-columns: 1fr; }
+  .hero-visual { display: none; }
+  .area-row { grid-template-columns: 1fr; gap: 6px; }
+  .how-steps { grid-template-columns: 1fr; gap: 28px; }
+  .hero { padding: 64px 20px 72px; }
+  .areas, .how { padding: 56px 20px; }
+}
