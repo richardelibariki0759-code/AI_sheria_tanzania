@@ -25,10 +25,6 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   isExpanded = true;
   draftMessage = '';
 
-  // Once true, the topic chips are hidden — they're only for the
-  // empty/welcome state before the user has actually said anything.
-  chatStarted = false;
-
   // Starts empty — filled in by GET /api/topics once the component loads.
   topics: string[] = [];
 
@@ -79,8 +75,6 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   }
 
   private sendToBackend(text: string): void {
-    this.chatStarted = true;
-
     // Show the user's own message immediately — don't wait on the network.
     this.messages.push({ from: 'user', text });
 

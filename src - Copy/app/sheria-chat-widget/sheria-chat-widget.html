@@ -49,19 +49,17 @@
           </div>
         </div>
 
-        <ng-container *ngIf="topics.length && !chatStarted">
-          <div class="topic-divider">
-            <span class="divider-line"></span>
-            <span class="divider-label">↓ Choose a topic to get started</span>
-            <span class="divider-line"></span>
-          </div>
+        <div class="topic-divider" *ngIf="topics.length">
+          <span class="divider-line"></span>
+          <span class="divider-label">↓ Choose a topic to get started</span>
+          <span class="divider-line"></span>
+        </div>
 
-          <div class="topic-grid">
-            <button type="button" class="topic-chip" *ngFor="let topic of topics" (click)="selectTopic(topic)">
-              {{ topic }}
-            </button>
-          </div>
-        </ng-container>
+        <div class="topic-grid">
+          <button type="button" class="topic-chip" *ngFor="let topic of topics" (click)="selectTopic(topic)">
+            {{ topic }}
+          </button>
+        </div>
       </div>
 
       <!-- Input bar -->

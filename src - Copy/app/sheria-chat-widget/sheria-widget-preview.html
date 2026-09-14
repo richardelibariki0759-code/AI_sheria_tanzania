@@ -270,7 +270,7 @@
     "As a consumer you typically have the right to a refund or repair if a product is faulty — keep your receipt as proof of purchase.",
     "That depends on your jurisdiction, but generally you have the right to remain silent and to request a lawyer before answering questions."
   ];
-  let isOpen = true, isExpanded = true, replyIdx = 0, chatStarted = false;
+  let isOpen = true, isExpanded = true, replyIdx = 0;
 
   const shell = document.getElementById('shell');
   const widgetBody = document.getElementById('widgetBody');
@@ -315,11 +315,6 @@
   }
 
   function sendToBackend(text) {
-    if (!chatStarted) {
-      chatStarted = true;
-      topicDivider.style.display = 'none';
-      topicGrid.style.display = 'none';
-    }
     addMessage('user', text);
     showTyping();
     setTimeout(() => {
