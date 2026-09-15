@@ -8,7 +8,7 @@ interface ChatMessage {
   text: string;
 }
 
-const API_BASE_URL = 'http://127.0.0.1:5000';
+const API_BASE_URL = 'https://sheria-ai-backend-a87r.onrender.com';
 
 @Component({
   selector: 'app-sheria-chat-widget',
@@ -39,7 +39,7 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   ngOnInit(): void {
     this.http.get<{ topics: string[] }>(`${API_BASE_URL}/api/topics`).subscribe({
       next: (res) => (this.topics = res.topics),
-      error: (err) => console.error('Could not load topics from Flask:', err)
+      error: (err) => console.error('Could not load topics from backend:', err)
     });
   }
 
@@ -83,7 +83,7 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
         error: () =>
           this.messages.push({
             from: 'bot',
-            text: "Sorry, I couldn't reach the server. Is the Flask app running?"
+            text: "Sorry, I couldn't reach the server. It may be waking up from sleep — try again in a moment."
           })
       });
   }
