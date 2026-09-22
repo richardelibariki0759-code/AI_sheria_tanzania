@@ -75,10 +75,16 @@ export class SheriaChatWidget implements OnInit, AfterViewChecked {
   private sendToBackend(text: string): void {
     this.chatStarted = true;
 
+    // Snapshot history BEFORE pushing the new user message, so the
+    // backend gets prior turns only — used to detect follow-ups.
+    const history = this.messages
+      .slice(-8)
+      .map((m) => ({ role: m.from === 'user' ? 'user' : 'assistant', content: m.text }));
+
     this.messages.push({ from: 'user', text });
 
     this.http
-      .post<{ reply: string }>(`${API_BASE_URL}/api/chat`, { message: text })
+      .post<{ reply: string }>(`${API_BASE_URL}/api/chat`, { message: text, history })
       .subscribe({
         next: (res) => this.messages.push({ from: 'bot', text: res.reply }),
         error: () =>
