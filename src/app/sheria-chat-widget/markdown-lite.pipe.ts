@@ -45,8 +45,8 @@ export class MarkdownLitePipe implements PipeTransform {
         continue;
       }
 
-      const bulletMatch = line.match(/^[-*]\s+(.*)$/);
-      const numberedMatch = line.match(/^\d+[.)]\s+(.*)$/);
+      const bulletMatch = line.match(/^[-*•‣▪]\s+(.*)$/);
+      const numberedMatch = line.match(/^\(?\d+[.)]\s+(.*)$/);
 
       if (bulletMatch) {
         if (listType !== 'ul') {
